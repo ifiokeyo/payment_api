@@ -1,0 +1,47 @@
+version: "3"
+services:
+  app:
+    build:
+      context: .
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./app:/app
+    command: >
+      sh -c  "flask db upgrade && flask run -h '0.0.0.0' -p 9000"
+    env_file:
+      - test.env
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: test_salamantex
+      POSTGRES_PASSWORD: postgres
+      SQLALCHEMY_DATABASE_URI: postgresql://postgres:postgres@db:5432/test_salamantex
+      REDIS_URL: redis://${REDIS_HOST}:6379/{REDIS_DB}
+    depends_on:
+      - db
+      - redis
+  db:
+    restart: always
+    image: postgres:10-alpine
+    ports:
+      - "54322:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: test_salamantex
+      POSTGRES_PASSWORD: postgres
+  worker:
+    image: app
+    command: >
+      sh -c "python ./run_worker.py"
+    env_file:
+      - test.env
+    environment:
+      REDIS_URL: redis://${REDIS_HOST}:6379/{REDIS_DB}
+    volumes:
+      - ./app:/app
+    depends_on:
+      - redis
+  redis:
+    image: "redis:alpine"
+    sysctls:
+      net.core.somaxconn: '511'
