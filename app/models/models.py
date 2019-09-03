@@ -5,7 +5,6 @@ from uuid import uuid4
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
-from flask_restful import reqparse
 
 
 db = SQLAlchemy()

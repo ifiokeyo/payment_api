@@ -30,6 +30,20 @@ def validate_transaction(fn):
         request_payload = request.get_json()
         current_user = get_jwt_identity()
 
+        if request_payload['type'] == 'BTC' and ((not request_payload['source_wallet_id'].startswith('BTC')) or
+                                                 (not request_payload['target_wallet_id'].startswith('BTC'))):
+            return {
+                "status": "fail",
+                "message": "Wallet ids must begin with BTC"
+            }
+
+        if request_payload['type'] == 'ETH' and ((not request_payload['source_wallet_id'].startswith('ETH')) or
+                                                 (not request_payload['target_wallet_id'].startswith('ETH'))):
+            return {
+                "status": "fail",
+                "message": "Wallet ids must begin with ETH"
+            }
+
         source_user = User.query.filter_by(bitcoinWalletId=request_payload['source_wallet_id']).first_or_404() if \
             request_payload['type'] == 'BTC' else \
             User.query.filter_by(ethereumWalletId=request_payload['source_wallet_id']).first_or_404()

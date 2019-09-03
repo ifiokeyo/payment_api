@@ -56,7 +56,8 @@ class AccountSetupResource(Resource):
 
         account_holder.description = request_payload['description'] if account_holder.description is None else \
                                          account_holder.description
-        account_holder.max_amount = request_payload['max_amount']
+        account_holder.max_amount = request_payload['max_amount'] if account_holder.max_amount == 0 \
+            else account_holder.max_amount
         account_holder.update()
 
         account_type = 'Bitcoin' if request_payload['type'] == 'BTC' else 'Ethereum'
